@@ -1,0 +1,48 @@
+input: '*11 1 100*'
+blank: ' '
+start state: moveStart
+table:
+  # Перемещение в начало строки
+  moveStart:
+    [0, 1, 'o', 'l', ' ']: L
+    '*': {R: tagFirstChar}
+  # Помечаем первый неотмеченный символ
+  tagFirstChar:
+    0: {write: 'o', R: goNextWord}
+    1: {write: 'l', R: goNextWord}
+    ['o', 'l', '*']: R
+    ' ': {write: '+', L: found}
+    '*': {L: found}
+  # Переходим к следующему слову 
+  goNextWord:
+    [0, 1, 'o','l']: R
+    '*': {L: moveStart}
+    ' ': {R: tagFirstChar}
+  # Слово с минимальной длиной найдено
+  found:
+    'o': {write: '0', L}
+    'l': {write: '1', L}
+    ' ': {write: '+', L: moveStartForClear}
+    '*': {write: '+', L: clearFirstWords}
+  # Перемещаемся в начало строки для очищения ненужных слов
+  moveStartForClear:
+    [0, 1, 'o', 'l', ' ', '*']: L
+    '*': {L: clearFirstWords}  
+  # Очищаем ленту до нужного слова
+  clearFirstWords:
+    [0, 1, 'o', 'l', ' ', '*']: {write: ' ', R}
+    '+': {R: missWord}
+  # Очищаем ленту после нужного слова
+  clearLastWords:
+    [0, 1, 'o', 'l', ' ']: {write: ' ', R}
+    '*': {write: ' ', L: end}
+  # Игнорируем нужное нам слово
+  missWord:
+    [0, 1, 'o', 'l']: R
+    '+': {write: ' ', R: clearLastWords}
+    '*': {write: ' ', L: end}
+  # Удаляем '+' и устанавливаем каретку на начале нужного слова
+  end:
+    [0, 1, ' ']: L
+    '+': {write: ' ', R: done}
+  done:

@@ -1,0 +1,21 @@
+#1.1 Сложение двух унарных чисел
+input: '111+11'
+blank: ' '
+start state: moveRight
+table:
+  # Двигаемся вправо до конца выражения
+  moveRight:
+    [1,+]: R
+    ' ' : {L: deleteOne}
+  # Удаляем последнюю единицу
+  deleteOne:
+    1: {write: ' ', L: replacePlus}
+  # Заменяем + на 1
+  replacePlus:
+    1: L
+    +: {write: 1, L: moveLeft}
+  # Двигаемся влево к началу выражения
+  moveLeft:
+    1: L
+    ' ': {R: done}
+  done:

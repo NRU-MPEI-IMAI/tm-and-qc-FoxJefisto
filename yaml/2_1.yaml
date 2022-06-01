@@ -1,0 +1,39 @@
+# 2.1 Принадлежность к языку L = {0^n1^n2^n}, n>=0
+input: '000111222'
+blank: ' '
+start state: checkZero
+table:
+  # Ищем 0
+  checkZero:
+    ' ': {L: done}
+    0: {write: x, R: checkOne}
+    [1, 2]: {R: reject}
+    x: R
+  # Ищем 1
+  checkOne:
+    [0, x]: R
+    1: {write: x, R: checkTwo}
+    [2, ' ']: {L: reject}
+  # Ищем 2
+  checkTwo:
+    [1, x]: R
+    2: {write: x, L: moveToStart}
+    ' ': {L: reject}
+  # Вернемся в начало
+  moveToStart:
+    [0, 1, 2, x]: L
+    ' ': {R: checkZero}
+  # Слово соответствует языку, очищаем ленту и выводим y
+  done:
+    x: {write: ' ', L}
+    ' ': {write: y, R: exit}
+  # Слово не соответствует языку, 
+  reject:
+    [x, 0, 1, 2]: R
+    ' ': {L: clear}
+  # Очищаем ленту и выводим n
+  clear:
+    [x, 0, 1, 2]: {write: ' ', L}
+    ' ': {write: n, R: exit}
+  exit:
+    ' ': L

@@ -1,0 +1,53 @@
+input: '([{}])'
+blank: ' '
+start state: start
+table:
+  # Старт
+  start:
+    ' ': {L: printY}
+    ['(', '[', '{']: {R: findRight}
+    [')', ']', '}']: {L: reject}
+  # Ищем правые скобки
+  findRight:
+    ' ': {L: checkResult}
+    ['(', '[', '{', 'x']: R
+    ')': {write: 'x', L: findLeftRound}
+    ']': {write: 'x', L: findLeftSquare}
+    '}': {write: 'x', L: findLeftFigure}
+  # Ищем левые круглые скобки
+  findLeftRound:
+    ' ': {R: reject}
+    '(': {write: 'x', R:  findRight}
+    ['[', '{']: {L: reject}
+    'x': L
+  # Ищем левые квадратные скобки
+  findLeftSquare:
+    ' ': {R: reject}
+    '[': {write: 'x', R: findRight}
+    ['(', '{']: {L: reject}
+    'x': L
+  # Ищем левые фигурные скобки
+  findLeftFigure:
+    ' ': {R: reject}
+    '{': {write: 'x', R: findRight}
+    ['[', '(']: {L: reject}
+    'x': L 
+  # Проверяем результат
+  checkResult:
+    ['(', '[', '{']: {L: reject}
+    'x': L
+    ' ': {R: printY}
+  # Нашли не закрытую скобку при проверке
+  reject:
+    ['(', ')', '[', ']', '{', '}', 'x']: {write: ' ', R}
+    ' ': {R: printN}
+  # Очищаем ленту и записываем результат
+  printN:
+    ['(', ')', '[', ']', '{', '}', 'x']: {write: ' ', R: printN}
+    ' ': {write: n, L: done}
+  # Очищаем ленту и записываем результат
+  printY:
+    ' ': {write: y, L: done}
+    'x': {write: ' ', R}
+
+  done:

@@ -1,0 +1,52 @@
+# 1.2 Умножение двух унарных чисел
+input: '111*111'
+blank: ' '
+start state: addEq
+table:
+  # Двигаемся направо в конец выражения и ставим "="
+  addEq:
+    [1, '*']: R
+    ' ': {write: =, L: moveToStart}
+  # Возвращаемся в начало
+  moveToStart:
+    [1, '*']: L
+    ' ': {R: startMult}
+  # Начинаем операцию умножения
+  startMult:
+    1: {write: x, R: moveToSecond}
+    x: R
+    '*': {L: endMult}
+  # Двигаемся направо ко второму множителю
+  moveToSecond:
+    1: R
+    '*': {R: second}
+  # Заменяем первую 1 на x
+  second:
+    x: R
+    1: {write: x, R: moveToAnswer}
+    =: {L: restoreSecond}
+  # Двигаемся направо и переносим эту единицу в ответ
+  moveToAnswer:
+    [1, =]: R
+    ' ': {write: 1, L: backToSecond}
+  # Возвращаемся ко второму множителю
+  backToSecond:
+    [1, =]: L
+    x: {R: second}
+  # Восстанавливаем второй множитель
+  restoreSecond:
+    x: {write: 1, L}
+    '*': {L: moveToFirst}
+  # Переходим к первому числу для обработки остальных разрядов
+  moveToFirst:
+    1: L
+    x: {R: startMult}
+  # Двигаемся к левому краю. Окончание умножения
+  endMult:
+    x: L
+    ' ': {R: clear}
+  # Очищаем все ненужные данные
+  clear:
+    [1, '*', x]: {write: ' ', R: clear}
+    =: {write: ' ', R: done}
+  done:
